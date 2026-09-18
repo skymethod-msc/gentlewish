@@ -1,300 +1,319 @@
-<!DOCTYPE html>
-<html lang="en">
+ <!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>gentlewish</title>
-    
+    <title>gentlewish — Independent Digital Studio</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Font: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
     
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        background: '#F7F6F2',
-                        text: '#5A5A55',
-                        accent: '#A4947C',
-                        subtleBorder: 'rgba(90, 90, 85, 0.1)',
-                    },
-                    fontFamily: {
-                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-                    },
-                    transitionTimingFunction: {
-                        'gentle': 'cubic-bezier(0.16, 1, 0.3, 1)',
-                    }
-                }
-            }
-        }
-    </script>
-
     <style>
+        :root {
+            --bg-color: #F7F6F2;
+            --text-color: #5A5A55;
+            --accent-color: #A4947C;
+            --border-color: rgba(90, 90, 85, 0.12);
+        }
+
         body {
-            background-color: #F7F6F2;
-            color: #5A5A55;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             margin: 0;
             padding: 0;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             overflow-x: hidden;
-            scroll-behavior: smooth;
         }
 
         ::selection {
-            background-color: #A4947C40; /* 40 is hex for 25% opacity */
-            color: #5A5A55;
+            background-color: rgba(164, 148, 124, 0.2);
+            color: var(--text-color);
         }
 
-        /* Ambient background breathing and mouse movement */
-        #ambient-blob {
-            --tx: 0px;
-            --ty: 0px;
-            animation: breathe 12s infinite ease-in-out;
-            will-change: transform;
-            transition: --tx 0.5s ease-out, --ty 0.5s ease-out;
-        }
-
-        @keyframes breathe {
-            0%, 100% { transform: translate(var(--tx), var(--ty)) scale(1); }
-            50% { transform: translate(var(--tx), var(--ty)) scale(1.05); }
-        }
-
-        /* Scroll reveal utility classes (replacing Framer Motion) */
-        .reveal-up {
+        .fade-in-element {
             opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 1.5s cubic-bezier(0.16, 1, 0.3, 1), transform 1.5s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        
-        .reveal-fade {
-            opacity: 0;
-            transition: opacity 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateY(16px);
+            transition: opacity 1.4s cubic-bezier(0.16, 1, 0.3, 1), transform 1.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .reveal-left {
-            opacity: 0;
-            transform: translateX(-10px);
-            transition: opacity 1s ease-out, transform 1s ease-out;
+        .fade-in-element.is-visible {
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        /* Trigger class when element enters viewport */
-        .is-revealed {
-            opacity: 1 !important;
-            transform: translate(0, 0) scale(1) !important;
+        /* Continuous rotation for hero SVG shape */
+        @keyframes spinSlow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .rotate-slow {
+            animation: spinSlow 75s linear infinite;
+        }
+
+        /* SVG morph path transition: buttery smooth easing with hardware optimization */
+        .morph-path {
+            will-change: d;
+            transition: d 5s cubic-bezier(0.37, 0, 0.21, 1);
         }
     </style>
 </head>
-<body class="min-h-screen w-full">
+<body class="relative min-h-screen">
 
-    <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <div id="ambient-blob" 
-             class="absolute rounded-full blur-[120px] opacity-[0.15] bg-accent"
-             style="width: 40vw; height: 40vw; left: 30%; top: 20%;">
+    <!-- Ambient glowing element following mouse subtly -->
+    <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div id="ambient-glow" 
+             class="fixed rounded-full blur-[120px] pointer-events-none opacity-[0.14] transition-transform duration-700 ease-out z-0"
+             style="width: 45vw; height: 45vw; background-color: var(--accent-color); left: 28%; top: 22%;">
         </div>
     </div>
 
-    <main class="relative z-10">
-        <nav class="fixed top-0 left-0 right-0 z-50 p-6 md:p-12 flex justify-between items-center mix-blend-multiply">
-            <div class="text-lg tracking-tight font-medium reveal-up is-revealed" style="transition-delay: 0s;">
-                gentlewish
-            </div>
-            
-            <div class="flex items-center gap-6 md:gap-12">
-                <ul class="hidden md:flex gap-8 text-sm tracking-wide reveal-fade is-revealed" style="transition-delay: 500ms;">
-                    <li><a href="#about" class="opacity-60 hover:opacity-100 transition-opacity duration-500" data-i18n="nav_about">About</a></li>
-                    <li><a href="#experiments" class="opacity-60 hover:opacity-100 transition-opacity duration-500" data-i18n="nav_exp">Experiments</a></li>
-                    <li><a href="#contact" class="opacity-60 hover:opacity-100 transition-opacity duration-500" data-i18n="nav_contact">Contact</a></li>
-                </ul>
-                
-                <div class="flex space-x-3 text-xs tracking-widest font-medium reveal-fade is-revealed" style="transition-delay: 700ms;">
-                    <button id="btn-en" onclick="setLang('en')" class="transition-opacity duration-500 opacity-100">EN</button>
-                    <span class="opacity-20">/</span>
-                    <button id="btn-es" onclick="setLang('es')" class="transition-opacity duration-500 opacity-30 hover:opacity-70">ES</button>
-                </div>
-            </div>
-        </nav>
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 p-6 md:p-12 flex justify-between items-center mix-blend-multiply">
+        <a href="#" class="text-lg tracking-tight font-medium select-none" style="color: var(--text-color);">
+            gentlewish
+        </a>
 
-        <section class="relative h-screen flex flex-col justify-center px-6 md:px-12 z-10 pt-20">
+        <div class="flex items-center gap-6 md:gap-12">
+            <ul class="hidden md:flex gap-8 text-sm tracking-wide" style="color: var(--text-color);">
+                <li>
+                    <a href="#about" data-i18n="navAbout" class="opacity-60 hover:opacity-100 transition-opacity duration-500">About</a>
+                </li>
+                <li>
+                    <a href="#experiments" data-i18n="navExp" class="opacity-60 hover:opacity-100 transition-opacity duration-500">Experiments</a>
+                </li>
+                <li>
+                    <a href="#contact" data-i18n="navContact" class="opacity-60 hover:opacity-100 transition-opacity duration-500">Contact</a>
+                </li>
+            </ul>
+
+            <div class="flex space-x-3 text-xs tracking-widest font-medium" style="color: var(--text-color);">
+                <button id="btn-en" onclick="setLanguage('en')" aria-label="Switch to English" class="transition-opacity duration-500 opacity-100">
+                    EN
+                </button>
+                <span class="opacity-20">/</span>
+                <button id="btn-es" onclick="setLanguage('es')" aria-label="Cambiar a Español" class="transition-opacity duration-500 opacity-35 hover:opacity-75">
+                    ES
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="relative z-10">
+        <!-- Hero Section -->
+        <section class="relative h-screen flex flex-col justify-center px-6 md:px-12 pt-20">
             <div class="max-w-4xl">
-                <h1 class="text-6xl md:text-8xl lg:text-9xl tracking-tighter font-medium mb-12 reveal-up is-revealed" style="transition-delay: 200ms;">
-                    gentlewish
-                </h1>
-                
-                <p class="text-xl md:text-2xl opacity-70 mb-32 tracking-wide font-light reveal-fade is-revealed" data-i18n="hero_studio" style="transition-delay: 800ms;">
+                <div class="flex items-baseline mb-12 fade-in-element is-visible">
+                    <h1 class="text-6xl md:text-8xl lg:text-9xl tracking-tighter font-medium leading-none" style="color: var(--text-color);">
+                        gentlewish
+                    </h1>
+                    <!-- Morphing geometry SVG -->
+                    <svg viewBox="0 0 100 100" class="w-3 h-3 md:w-5 md:h-5 lg:w-6 lg:h-6 ml-6 md:ml-10 opacity-80 inline-block align-middle rotate-slow" style="fill: var(--accent-color);">
+                        <path id="morphPath" class="morph-path" d="M 50 20 C 66.57 20 80 33.43 80 50 C 80 66.57 66.57 80 50 80 C 33.43 80 20 66.57 20 50 C 20 33.43 33.43 20 50 20 Z" />
+                    </svg>
+                </div>
+
+                <p data-i18n="heroStudio" class="text-xl md:text-2xl opacity-70 mb-28 tracking-wide font-light fade-in-element is-visible" style="color: var(--text-color); transition-delay: 0.2s;">
                     Independent digital studio.
                 </p>
 
-                <div class="text-lg md:text-xl space-y-1 font-light opacity-80 reveal-fade is-revealed" style="transition-delay: 1400ms;">
-                    <p data-i18n="hero_p1">Small things.</p>
-                    <p data-i18n="hero_p2">Real questions.</p>
+                <div class="text-lg md:text-xl space-y-1 font-light opacity-80 fade-in-element is-visible" style="color: var(--text-color); transition-delay: 0.4s;">
+                    <p data-i18n="heroP1">Small things.</p>
+                    <p data-i18n="heroP2">Real questions.</p>
                 </div>
             </div>
         </section>
 
-        <section id="about" class="py-32 md:py-48 px-6 md:px-12 z-10 relative">
+        <!-- Approach Section -->
+        <section id="about" class="py-32 md:py-48 px-6 md:px-12 relative">
             <div class="max-w-2xl mx-auto md:ml-auto md:mr-32">
-                <p class="text-2xl md:text-3xl lg:text-4xl leading-snug font-light mb-24 reveal-up" data-i18n="approach_title">
+                <p data-i18n="approachTitle" class="text-2xl md:text-3xl lg:text-4xl leading-snug font-light mb-24 fade-in-element" style="color: var(--text-color);">
                     We make small digital things around questions worth asking.
                 </p>
 
-                <div class="space-y-12 border-l pl-8 border-subtleBorder">
-                    <div class="text-lg md:text-xl font-medium tracking-wide opacity-80 reveal-left" data-i18n="principle_1" style="transition-delay: 200ms;">Human before system.</div>
-                    <div class="text-lg md:text-xl font-medium tracking-wide opacity-80 reveal-left" data-i18n="principle_2" style="transition-delay: 350ms;">Curiosity over certainty.</div>
-                    <div class="text-lg md:text-xl font-medium tracking-wide opacity-80 reveal-left" data-i18n="principle_3" style="transition-delay: 500ms;">Meaning over metrics.</div>
+                <div class="space-y-10 border-l pl-8" style="border-color: var(--border-color);">
+                    <div data-i18n="p1" class="text-lg md:text-xl font-medium tracking-wide opacity-80 fade-in-element" style="color: var(--text-color); transition-delay: 0.1s;">
+                        Human before system.
+                    </div>
+                    <div data-i18n="p2" class="text-lg md:text-xl font-medium tracking-wide opacity-80 fade-in-element" style="color: var(--text-color); transition-delay: 0.2s;">
+                        Curiosity over certainty.
+                    </div>
+                    <div data-i18n="p3" class="text-lg md:text-xl font-medium tracking-wide opacity-80 fade-in-element" style="color: var(--text-color); transition-delay: 0.3s;">
+                        Meaning over metrics.
+                    </div>
                 </div>
             </div>
         </section>
 
-        <section id="experiments" class="py-32 md:py-48 px-6 md:px-12 z-10 relative flex items-center justify-center min-h-[40vh]">
+        <!-- Experiments Section -->
+        <section id="experiments" class="py-32 md:py-48 px-6 md:px-12 relative flex items-center justify-center min-h-[45vh]">
             <div class="text-center">
-                <h2 class="text-xl md:text-2xl font-light tracking-wide mb-6 reveal-up" data-i18n="exp_title">
+                <h2 data-i18n="expTitle" class="text-xl md:text-2xl font-light tracking-wide mb-6 fade-in-element" style="color: var(--text-color);">
                     Experiments
                 </h2>
-                <div class="text-sm tracking-widest uppercase opacity-40 reveal-fade" data-i18n="exp_coming" style="transition-delay: 300ms;">
+                <div data-i18n="expComing" class="text-xs tracking-[0.25em] uppercase opacity-40 font-medium fade-in-element" style="color: var(--text-color); transition-delay: 0.2s;">
                     Coming Soon
                 </div>
             </div>
         </section>
 
-        <section id="contact" class="py-32 md:py-48 px-6 md:px-12 z-10 relative flex flex-col items-center justify-center">
-            <div class="text-center space-y-8 reveal-up">
-                <p class="text-lg md:text-xl font-light opacity-60" data-i18n="contact_sub">
+        <!-- Contact Section -->
+        <section id="contact" class="py-32 md:py-48 px-6 md:px-12 relative flex flex-col items-center justify-center">
+            <div class="text-center space-y-8">
+                <p data-i18n="contactSub" class="text-lg md:text-xl font-light opacity-60 fade-in-element" style="color: var(--text-color);">
                     For inquiries and dialogue
                 </p>
-                <a href="mailto:studio@gentlewish.com" class="block text-3xl md:text-5xl lg:text-6xl tracking-tight font-medium hover:opacity-50 transition-opacity duration-700">
+                <a href="mailto:studio@gentlewish.com" class="block text-2xl md:text-5xl lg:text-6xl tracking-tight font-medium hover:opacity-50 transition-opacity duration-700 fade-in-element" style="color: var(--text-color); transition-delay: 0.1s;">
                     studio@gentlewish.com
                 </a>
             </div>
         </section>
-
-        <footer class="pt-24 pb-12 px-6 md:px-12 z-10 relative flex flex-col justify-between">
-            <div class="max-w-xl mx-auto text-center mb-32">
-                <p class="text-lg md:text-xl font-light leading-relaxed opacity-60 reveal-fade" data-i18n="footer_desc">
-                    gentlewish is an independent studio exploring the space between technology, human experience and imagination.
-                </p>
-            </div>
-
-            <div class="flex justify-between items-end text-sm opacity-50">
-                <div>gentlewish</div>
-                <div>© 2026</div>
-                <div>
-                    <a href="#contact" class="hover:opacity-100 transition-opacity duration-500" data-i18n="footer_contact">Contact</a>
-                </div>
-            </div>
-        </footer>
     </main>
 
+    <!-- Footer -->
+    <footer class="pt-24 pb-12 px-6 md:px-12 relative flex flex-col justify-between z-10">
+        <div class="max-w-xl mx-auto text-center mb-32">
+            <p data-i18n="footerDesc" class="text-lg md:text-xl font-light leading-relaxed opacity-60 fade-in-element" style="color: var(--text-color);">
+                gentlewish is an independent studio exploring the space between technology, human experience and imagination.
+            </p>
+        </div>
+
+        <div class="flex justify-between items-end text-sm opacity-50" style="color: var(--text-color);">
+            <div>gentlewish</div>
+            <div>© 2026</div>
+            <div>
+                <a href="#contact" data-i18n="footerContact" class="hover:opacity-100 transition-opacity duration-500">Contact</a>
+            </div>
+        </div>
+    </footer>
+
     <script>
-        // 1. Dictionaries for Translation
-        const translations = {
+        // Translations Data Dictionary
+        const TRANSLATIONS = {
             en: {
-                nav_about: 'About',
-                nav_exp: 'Experiments',
-                nav_contact: 'Contact',
-                hero_studio: 'Independent digital studio.',
-                hero_p1: 'Small things.',
-                hero_p2: 'Real questions.',
-                approach_title: 'We make small digital things around questions worth asking.',
-                principle_1: 'Human before system.',
-                principle_2: 'Curiosity over certainty.',
-                principle_3: 'Meaning over metrics.',
-                exp_title: 'Experiments',
-                exp_coming: 'Coming Soon',
-                contact_sub: 'For inquiries and dialogue',
-                footer_desc: 'gentlewish is an independent studio exploring the space between technology, human experience and imagination.',
-                footer_contact: 'Contact'
+                navAbout: "About",
+                navExp: "Experiments",
+                navContact: "Contact",
+                heroStudio: "Independent digital studio.",
+                heroP1: "Small things.",
+                heroP2: "Real questions.",
+                approachTitle: "We make small digital things around questions worth asking.",
+                p1: "Human before system.",
+                p2: "Curiosity over certainty.",
+                p3: "Meaning over metrics.",
+                expTitle: "Experiments",
+                expComing: "Coming Soon",
+                contactSub: "For inquiries and dialogue",
+                footerDesc: "gentlewish is an independent studio exploring the space between technology, human experience and imagination.",
+                footerContact: "Contact"
             },
             es: {
-                nav_about: 'Nosotros',
-                nav_exp: 'Experimentos',
-                nav_contact: 'Contacto',
-                hero_studio: 'Estudio digital independiente.',
-                hero_p1: 'Cosas pequeñas.',
-                hero_p2: 'Preguntas reales.',
-                approach_title: 'Creamos cosas digitales pequeñas en torno a preguntas que vale la pena hacer.',
-                principle_1: 'Lo humano antes que el sistema.',
-                principle_2: 'Curiosidad sobre certeza.',
-                principle_3: 'Significado sobre métricas.',
-                exp_title: 'Experimentos',
-                exp_coming: 'Próximamente',
-                contact_sub: 'Para consultas y diálogo',
-                footer_desc: 'gentlewish es un estudio independiente explorando el espacio entre la tecnología, la experiencia humana y la imaginación.',
-                footer_contact: 'Contacto'
+                navAbout: "Nosotros",
+                navExp: "Experimentos",
+                navContact: "Contacto",
+                heroStudio: "Estudio digital independiente.",
+                heroP1: "Cosas pequeñas.",
+                heroP2: "Preguntas reales.",
+                approachTitle: "Creamos cosas digitales pequeñas en torno a preguntas que vale la pena hacer.",
+                p1: "Lo humano antes que el sistema.",
+                p2: "Curiosidad sobre certeza.",
+                p3: "Significado sobre métricas.",
+                expTitle: "Experimentos",
+                expComing: "Próximamente",
+                contactSub: "Para consultas y diálogo",
+                footerDesc: "gentlewish es un estudio independiente explorando el espacio entre la tecnología, la experiencia humana y la imaginación.",
+                footerContact: "Contacto"
             }
         };
 
-        // 2. Language Toggle Logic
         let currentLang = 'en';
-        
-        function setLang(lang) {
+
+        function setLanguage(lang) {
             currentLang = lang;
-            
-            // Update UI buttons
-            document.getElementById('btn-en').className = `transition-opacity duration-500 ${lang === 'en' ? 'opacity-100' : 'opacity-30 hover:opacity-70'}`;
-            document.getElementById('btn-es').className = `transition-opacity duration-500 ${lang === 'es' ? 'opacity-100' : 'opacity-30 hover:opacity-70'}`;
-            
-            // Update text elements
+            const t = TRANSLATIONS[lang];
+
+            // Update all DOM elements with matching data-i18n attributes
             document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
-                if (translations[lang][key]) {
-                    // Slight fade effect during translation change
-                    el.style.opacity = parseFloat(window.getComputedStyle(el).opacity) > 0 ? '0.2' : '0';
-                    setTimeout(() => {
-                        el.textContent = translations[lang][key];
-                        // If it's a revealed element, restore its full opacity
-                        if(el.classList.contains('is-revealed') || parseFloat(window.getComputedStyle(el).opacity) > 0) {
-                             el.style.opacity = '';
-                        }
-                    }, 250);
+                if (t[key]) {
+                    el.textContent = t[key];
                 }
             });
-            document.documentElement.lang = lang;
+
+            // Update language toggle active states
+            const btnEn = document.getElementById('btn-en');
+            const btnEs = document.getElementById('btn-es');
+
+            if (lang === 'en') {
+                btnEn.className = 'transition-opacity duration-500 opacity-100';
+                btnEs.className = 'transition-opacity duration-500 opacity-35 hover:opacity-75';
+            } else {
+                btnEn.className = 'transition-opacity duration-500 opacity-35 hover:opacity-75';
+                btnEs.className = 'transition-opacity duration-500 opacity-100';
+            }
         }
 
-        // 3. Scroll Reveal Logic (Intersection Observer replacing Framer Motion)
-        document.addEventListener("DOMContentLoaded", () => {
-            const observerOptions = {
-                root: null,
-                rootMargin: '0px 0px -15% 0px', // Triggers slightly before element enters view completely
-                threshold: 0
-            };
+        // Mouse Tracking for Ambient Glow
+        const ambientGlow = document.getElementById('ambient-glow');
+        let targetX = 0;
+        let targetY = 0;
 
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('is-revealed');
-                        // Optional: Unobserve after revealing to make it play once
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, observerOptions);
-
-            const revealElements = document.querySelectorAll('.reveal-up, .reveal-fade, .reveal-left');
+        window.addEventListener('mousemove', (e) => {
+            // Calculate mouse displacement relative to center
+            targetX = ((e.clientX / window.innerWidth) * 2 - 1) * 25;
+            targetY = ((e.clientY / window.innerHeight) * 2 - 1) * 25;
             
-            // Don't observe hero elements, they are revealed by default (CSS classes initially present)
-            revealElements.forEach(el => {
-                if(!el.classList.contains('is-revealed')) {
-                     observer.observe(el);
+            ambientGlow.style.transform = `translate3d(${targetX}px, ${targetY}px, 0)`;
+        });
+
+        // SVG Shape Morphing sequence with 1:1 cubic bezier command structures for seamless transitions
+        const SHAPES = [
+            // Soft Circle / Seed
+            "M 50 20 C 66.57 20 80 33.43 80 50 C 80 66.57 66.57 80 50 80 C 33.43 80 20 66.57 20 50 C 20 33.43 33.43 20 50 20 Z",
+            // Rounded Square
+            "M 50 20 C 75 20 80 25 80 50 C 80 75 75 80 50 80 C 25 80 20 75 20 50 C 20 25 25 20 50 20 Z",
+            // Organic Soft Triangle
+            "M 50 18 C 50 18 82 72 82 78 C 82 82 18 82 18 78 C 18 72 50 18 50 18 C 50 18 50 18 50 18 Z",
+            // Living Star / Four-Point Astroid
+            "M 50 15 C 50 35 65 50 85 50 C 65 50 50 65 50 85 C 50 65 35 50 15 50 C 35 50 50 35 50 15 Z"
+        ];
+
+        let shapeIndex = 0;
+        const morphPath = document.getElementById('morphPath');
+
+        // Set initial shape
+        morphPath.setAttribute('d', SHAPES[0]);
+
+        // Quietly morph shape every 8.5 seconds (5s slow transition + 3.5s rest)
+        setInterval(() => {
+            shapeIndex = (shapeIndex + 1) % SHAPES.length;
+            morphPath.setAttribute('d', SHAPES[shapeIndex]);
+        }, 8500);
+
+        // Intersection Observer for graceful scroll-triggered fade-in animations
+        const observerOptions = {
+            root: null,
+            threshold: 0.15,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries, obs) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    obs.unobserve(entry.target);
                 }
             });
-        });
+        }, observerOptions);
 
-        // 4. Ambient Blob Interaction (Mouse tracking)
-        const blob = document.getElementById('ambient-blob');
-        
-        window.addEventListener('mousemove', (e) => {
-            // Calculate mouse position relative to center of screen, from -1 to 1
-            const x = (e.clientX / window.innerWidth) * 2 - 1;
-            const y = (e.clientY / window.innerHeight) * 2 - 1;
-            
-            // Apply slight displacement via CSS variables
-            blob.style.setProperty('--tx', `${x * 30}px`);
-            blob.style.setProperty('--ty', `${y * 30}px`);
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.fade-in-element').forEach(el => observer.observe(el));
         });
-
     </script>
 </body>
 </html>
