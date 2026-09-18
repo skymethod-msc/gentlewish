@@ -1,15 +1,17 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
-<head>
+<html lang="en" class="scroll-smooth"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>gentlewish</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts -->
+
+    <!-- Inter Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="gentlewish_studio%20morph_files/css2_kOci.css" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="gentlewish_studio%20morph_files/3.4_kOci.17"></script>
     
     <script>
         tailwind.config = {
@@ -22,8 +24,7 @@
                         studioBorder: 'rgba(90, 90, 85, 0.1)',
                     },
                     fontFamily: {
-                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-                        cursive: ['Caveat', 'cursive'],
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
                     }
                 }
             }
@@ -88,15 +89,12 @@
 
     <!-- Navigation Header -->
     <nav class="fixed top-0 left-0 right-0 z-50 p-6 md:p-12 flex justify-between items-center mix-blend-multiply">
-        <a href="#" class="text-lg tracking-tight font-medium flex items-baseline gap-1.5 text-studioText">
-            <span>gentlewish</span>
-            <span class="text-lg font-normal tracking-wide lowercase opacity-80 select-none ml-0.5 font-cursive text-studioAccent -rotate-3 -translate-y-0.5 inline-block">
-                
-            </span>
-        </a>
+        <div class="text-lg tracking-tight font-medium opacity-0 animate-fade-in" style="animation: fadeIn 1.5s ease-out forwards;">
+            gentlewish
+        </div>
         
         <div class="flex items-center gap-6 md:gap-12">
-            <ul class="hidden md:flex gap-8 text-sm tracking-wide text-studioText">
+            <ul class="hidden md:flex gap-8 text-sm tracking-wide">
                 <li><a href="#about" class="opacity-60 hover:opacity-100 transition-opacity duration-500" data-i18n="nav-about">About</a></li>
                 <li><a href="#experiments" class="opacity-60 hover:opacity-100 transition-opacity duration-500" data-i18n="nav-experiments">Experiments</a></li>
                 <li><a href="#contact" class="opacity-60 hover:opacity-100 transition-opacity duration-500" data-i18n="nav-contact">Contact</a></li>
